@@ -11,8 +11,9 @@
 #import "Settings.h"
 #import "AppConstants.h"
 
-@interface AddVC() {
+@interface AddVC() <UITextFieldDelegate> {
     TodoItem * item;
+    BOOL textIsDirty;
     BOOL isEditing;
     NSInteger editedIndex;
 }
@@ -63,10 +64,24 @@
 
 - (IBAction) priorityChanged:(UIStepper*)stepper {
     item.priority = stepper.value;
+    [self updateData];
     [self updateUI];
 }
 
+//MARK: UITextField functions
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
+    textIsDirty = YES;
+    return YES;
+}
+
 //MARK: Custom functions
+- (void) updateData {
+    if (!textIsDirty) {
+        return;
+    }
+    item.title = self.titleTextField.text;
+}
+
 - (void) updateUI {
     self.titleTextField.text = item.title;
     self.priorityLabel.text = [NSString stringWithFormat:@"%i: %@", (int)item.priority, item.nameForPriority];
